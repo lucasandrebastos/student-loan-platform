@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import axiosClient from "@/axios-client";
 
 type SignupCredentials = {
   name: string;
@@ -17,6 +18,17 @@ export default function SignUpPlatform() {
   } = useForm<SignupCredentials>();
   const onSubmit = (data: SignupCredentials) => {
     setIsLoading(true);
+    axiosClient
+      .post("/register", data)
+      .then((response) => {
+        console.log("Register response:", response.data);
+      })
+      .catch((err) => {
+        const response = err.response;
+        if (response && response.status === 422) {
+          alert(response.data.message);
+        }
+      });
     console.log("Sign Up attempt:", data);
     // Simulate a signup request
     setTimeout(() => {

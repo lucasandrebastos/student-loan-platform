@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useForm } from "react-hook-form";
+
+import axiosClient from "@/axios-client";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../AuthSlice";
+import { Navigate, useNavigate } from "react-router";
 
 type LoginCredentials = {
   email: string;
@@ -7,6 +12,8 @@ type LoginCredentials = {
 };
 
 export default function LoginPlatform() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -14,14 +21,18 @@ export default function LoginPlatform() {
     formState: { errors },
   } = useForm<LoginCredentials>();
 
-  const onSubmit = (data: LoginCredentials) => {
-    setIsLoading(true);
-    console.log("Login attempt:", data);
-    // Simulate a login request
-    setTimeout(() => {
+  const onSubmit = async (data: LoginCredentials) => {
+    try {
+      setIsLoading(true);
+      const response = await axiosClient.post("/login", data);
+      const token = response.data.token;
+      dispatch(loginSuccess(token));
       setIsLoading(false);
-      alert("Login successful!");
-    }, 2000);
+      navigate("/dashboard");
+    } catch (error) {
+      setIsLoading(false);
+      alert(`login invalido ${error}`);
+    }
   };
 
   return (

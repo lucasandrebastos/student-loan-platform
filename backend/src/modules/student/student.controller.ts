@@ -6,7 +6,7 @@ import { studentRepository } from "../student/student.repository";
 import { verifyJwt } from "../../utils/jwt";
 
 export async function getStudent(req: FastifyRequest, reply: FastifyReply) {
-  const email = req.user.email;
+  const email = "lucas";
   const student = await studentRepository.findStudentByEmail(email);
   if (!student) {
     return reply.code(401).send({
