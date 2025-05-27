@@ -1,10 +1,10 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import axiosClient from "@/axios-client";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../AuthSlice";
-import { Navigate, useNavigate } from "react-router";
+import { loginSuccess } from "../../../redux/AuthSlice";
+import { useNavigate } from "react-router";
 
 type LoginCredentials = {
   email: string;
@@ -26,7 +26,9 @@ export default function LoginPlatform() {
       setIsLoading(true);
       const response = await axiosClient.post("/login", data);
       const token = response.data.token;
+      localStorage.setItem("ACCESS_TOKEN", token);
       dispatch(loginSuccess(token));
+
       setIsLoading(false);
       navigate("/dashboard");
     } catch (error) {

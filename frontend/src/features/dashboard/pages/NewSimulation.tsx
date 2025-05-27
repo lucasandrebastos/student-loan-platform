@@ -1,3 +1,4 @@
+import axiosClient from "@/axios-client";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -16,13 +17,9 @@ export default function NewSimulation() {
   } = useForm<NewSimulationData>();
 
   const onSubmit = (data: NewSimulationData) => {
+    const response = axiosClient.post("/simulations", data);
+    console.log("Response:", response);
     setIsLoading(true);
-    console.log("Login attempt:", data);
-    // Simulate a login request
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Login successful!");
-    }, 2000);
   };
 
   return (

@@ -25,6 +25,6 @@ export async function loginController(
   reply: FastifyReply
 ) {
   const { email, password } = req.body;
-  const token = await authService.login({ email, password }, req);
+  const token = await authService.login({ email, password });
   return reply.send({ token });
 }

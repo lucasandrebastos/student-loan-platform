@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router";
-import AuthPlatform from "./features/auth/pages/auth-platform";
+import AuthPlatform from "./features/auth/pages/AuthPlatform";
 import Profile from "./features/dashboard/pages/Profile";
 import AppLayout from "./AppLayout";
-import StudentFinancingDashboard from "./features/dashboard/pages/student-dashboard";
+import StudentFinancingDashboard from "./features/dashboard/pages/Dashboard";
 import NewSimulation from "./features/dashboard/pages/NewSimulation";
 import History from "./features/dashboard/pages/History";
 import PrivateRoute from "./features/PrivateRoute";

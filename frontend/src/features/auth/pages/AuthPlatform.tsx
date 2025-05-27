@@ -1,6 +1,6 @@
 import { useState } from "react";
-import LoginPlatform from "../components/login-platform";
-import SignUpPlatform from "../components/signup-platform";
+import LoginPlatform from "../components/Login";
+import SignUpPlatform from "../components/Signup";
 
 export default function AuthPlatform() {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");

@@ -1,90 +1,44 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import axiosClient from "@/axios-client";
+import {
+  fetchSimulationsFailure,
+  fetchSimulationsStart,
+  fetchSimulationsSuccess,
+} from "@/redux/SimulationsSlice";
+import type { RootState } from "@/store";
+import { useEffect, useState } from "react";
 
-const mockSimulations = [
-  {
-    id: 1,
-    date: "2024-01-15",
-    amount: 25000,
-    duration: 48,
-    interestRate: 4.5,
-    status: "approved",
-    monthlyPayment: 572,
-  },
-  {
-    id: 2,
-    date: "2024-01-10",
-    amount: 15000,
-    duration: 36,
-    interestRate: 5.2,
-    status: "pending",
-    monthlyPayment: 451,
-  },
-  {
-    id: 3,
-    date: "2024-01-05",
-    amount: 30000,
-    duration: 60,
-    interestRate: 4.8,
-    status: "rejected",
-    monthlyPayment: 564,
-  },
-  {
-    id: 4,
-    date: "2023-12-20",
-    amount: 20000,
-    duration: 42,
-    interestRate: 4.2,
-    status: "approved",
-    monthlyPayment: 502,
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
 
-type UpdateProfile = {
-  name: string;
-  lastName: string;
-  password: string;
-};
 export default function renderHistory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
 
-  const filteredSimulations = mockSimulations.filter((sim) => {
-    const matchesSearch =
-      sim.amount.toString().includes(searchTerm) ||
-      sim.date.includes(searchTerm);
-    const matchesStatus = statusFilter === "all" || sim.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const dispatch = useDispatch();
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.simulations
+  );
+
+  useEffect(() => {
+    const fetchSimulations = async () => {
+      dispatch(fetchSimulationsStart());
+
+      try {
+        const response = await axiosClient.get("/simulations");
+        dispatch(fetchSimulationsSuccess(response.data));
+      } catch (err) {
+        dispatch(fetchSimulationsFailure("Erro ao buscar simulações"));
+      }
+    };
+
+    fetchSimulations();
+  }, [dispatch]);
+
+  const filteredSimulations = data.filter((sim) => {
+    const matchesSearch = sim.total_value.toString().includes(searchTerm);
+
+    return matchesSearch;
   });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UpdateProfile>();
-
-  const onSubmit = (data: UpdateProfile) => {
-    setIsLoading(true);
-    console.log("Login attempt:", data);
-    // Simulate a login request
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Login successful!");
-    }, 2000);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -159,7 +113,7 @@ export default function renderHistory() {
             All Simulations
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            Showing {filteredSimulations.length} of {mockSimulations.length}{" "}
+            {/* Showing {filteredSimulations.length} of {simulations?.length}{" "} */}
             simulations
           </p>
         </div>
@@ -179,12 +133,6 @@ export default function renderHistory() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Interest Rate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Monthly Payment
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -194,28 +142,16 @@ export default function renderHistory() {
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {simulation.date}
+                    {new Date(simulation.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${simulation.amount.toLocaleString()}
+                    ${simulation.monthly_installment_amount}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {simulation.duration} months
+                    {simulation.number_of_installments} months
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {simulation.interestRate}%
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${simulation.monthlyPayment}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
-                        simulation.status
-                      )}`}
-                    >
-                      {simulation.status}
-                    </span>
+                    {simulation.monthly_interest}%
                   </td>
                 </tr>
               ))}

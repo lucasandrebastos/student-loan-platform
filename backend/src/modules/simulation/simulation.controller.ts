@@ -4,6 +4,8 @@ import {
   UpdateSimulationInput,
 } from "./simulation.schema";
 import prisma from "../../utils/prisma";
+import { StudentPayload } from "../../@types/fastify-jwt";
+import { simulationRepository } from "./simulation.repository";
 
 export async function createSimulation(
   req: FastifyRequest<{
@@ -11,8 +13,9 @@ export async function createSimulation(
   }>,
   reply: FastifyReply
 ) {
-  const { total_value, number_of_installments, monthly_interest, studentId } =
-    req.body;
+  const { total_value, number_of_installments, monthly_interest } = req.body;
+
+  const { id } = req.user as StudentPayload;
 
   function calculatePMT(PV: number, n: number, iPercentual: number) {
     const i = iPercentual / 100;
@@ -20,40 +23,35 @@ export async function createSimulation(
     return PMT;
   }
   const monthlyInstallmentAmount = calculatePMT(
-    total_value,
-    number_of_installments,
-    monthly_interest
+    Number(total_value),
+    Number(number_of_installments),
+    Number(monthly_interest)
   );
 
-  const simulation = await prisma.simulation.create({
-    data: {
-      total_value: total_value,
-      number_of_installments: number_of_installments,
-      monthly_interest: monthly_interest,
-      monthly_installment_amount: monthlyInstallmentAmount,
-      studentId: studentId,
-    },
-  });
+  const simulation = await simulationRepository.createSimulation(
+    Number(total_value),
+    Number(number_of_installments),
+    Number(monthly_interest),
+    Number(monthlyInstallmentAmount),
+    id
+  );
+  console.log("simulation", simulation);
 
   return reply.status(201).send(simulation);
 }
 
-export async function getSimulations(
-  req: FastifyRequest<{
-    Querystring: { studentId: string };
-  }>,
-  reply: FastifyReply
-) {
-  if (!req.query.studentId) {
+//get simulations by studentId
+export async function getSimulations(req: FastifyRequest, reply: FastifyReply) {
+  const { id } = req.user as StudentPayload;
+  if (!id) {
     return reply.status(400).send({
       message: "Student ID is required",
     });
   }
 
-  const { studentId } = req.query;
   const simulations = await prisma.simulation.findMany({
     where: {
-      studentId: studentId,
+      studentId: id,
     },
   });
 

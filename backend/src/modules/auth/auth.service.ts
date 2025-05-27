@@ -1,6 +1,6 @@
 import { studentRepository } from "../student/student.repository";
 import bcrypt from "bcrypt";
-import { RegisterInput } from "./auth.schema";
+import { RegisterInput, LoginInput } from "./auth.schema";
 import { FastifyRequest } from "fastify";
 import { signJwt } from "../../utils/jwt";
 
@@ -27,10 +27,7 @@ export const authService = {
     }
   },
 
-  async login(
-    { email, password }: { email: string; password: string },
-    req: FastifyRequest
-  ) {
+  async login({ email, password }: LoginInput) {
     const student = await studentRepository.findStudentByEmail(email);
 
     if (!student) {

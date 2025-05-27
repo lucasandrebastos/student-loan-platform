@@ -3,10 +3,8 @@ import "@fastify/jwt";
 declare module "fastify" {
   interface FastifyRequest {
     jwt: import("@fastify/jwt").FastifyJWT;
-  }
-  interface FastifyRequest {
     jwtVerify(): Promise<void>;
-    user: { sub: string; email: string; iat: number; exp: number };
+    user: StudentPayload;
   }
 }
 type StudentPayload = {
@@ -14,6 +12,7 @@ type StudentPayload = {
   email: string;
   name: string;
 };
+
 declare module "@fastify/jwt" {
   interface FastifyJWT {
     student: StudentPayload;

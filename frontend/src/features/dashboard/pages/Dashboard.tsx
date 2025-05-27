@@ -1,14 +1,9 @@
-// Mock data
-const mockUser = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@university.edu",
-  phone: "+1 (555) 123-4567",
-  university: "Stanford University",
-  course: "Computer Science",
-  year: "3rd Year",
-  studentId: "STU-2024-001",
-  gpa: "3.8",
-};
+import axiosClient from "@/axios-client";
+import { setUser } from "@/redux/UserSlice";
+import type { RootState } from "@/store";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const mockStats = {
   totalSimulations: 12,
@@ -17,12 +12,30 @@ const mockStats = {
   totalFinanced: 180000,
 };
 
-export default function StudentFinancingDashboard() {
+export default function Dashboard() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosClient.get("/me");
+        dispatch(setUser(response.data));
+      } catch (err) {
+        console.error("Erro ao buscar dados do usuário", err);
+        navigate("/login");
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-gray-900">
-          Welcome back, {mockUser.name}!
+          Welcome back, {user && user.name}!
         </h2>
         <p className="text-gray-600 mt-2">
           Here's an overview of your financing simulations

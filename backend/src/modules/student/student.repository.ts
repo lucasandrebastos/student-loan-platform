@@ -1,4 +1,3 @@
-import { create } from "domain";
 import prisma from "../../utils/prisma";
 
 export const studentRepository = {
@@ -17,6 +16,12 @@ export const studentRepository = {
   async findStudentByEmail(email: string) {
     const student = await prisma.student.findUnique({
       where: { email: email },
+    });
+    return student;
+  },
+  async findById(id: string) {
+    const student = await prisma.student.findUnique({
+      where: { id: id },
     });
     return student;
   },

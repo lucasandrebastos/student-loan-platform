@@ -4,10 +4,12 @@ import bcrypt from "bcrypt";
 import prisma from "../../utils/prisma";
 import { studentRepository } from "../student/student.repository";
 import { verifyJwt } from "../../utils/jwt";
+import { StudentPayload } from "../../@types/fastify-jwt";
 
 export async function getStudent(req: FastifyRequest, reply: FastifyReply) {
-  const email = "lucas";
-  const student = await studentRepository.findStudentByEmail(email);
+  const { id } = req.user as StudentPayload;
+
+  const student = await studentRepository.findById(id);
   if (!student) {
     return reply.code(401).send({
       message: "Student not found",
