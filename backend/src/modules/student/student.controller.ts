@@ -3,8 +3,9 @@ import { GetMeInput, PutMeInput } from "./student.schema";
 import bcrypt from "bcrypt";
 import prisma from "../../utils/prisma";
 import { studentRepository } from "../student/student.repository";
-import { verifyJwt } from "../../utils/jwt";
+
 import { StudentPayload } from "../../@types/fastify-jwt";
+import { simulationRepository } from "../simulation/simulation.repository";
 
 export async function getStudent(req: FastifyRequest, reply: FastifyReply) {
   const { id } = req.user as StudentPayload;
@@ -45,4 +46,26 @@ export async function updateStudent(
   }
 
   return reply.code(200).send({ name, lastName, email });
+}
+
+export async function dashboard(req: FastifyRequest, reply: FastifyReply) {
+  const { id } = req.user as StudentPayload;
+
+  const totalSimulations = await simulationRepository.getTotalSimulations(id);
+
+  const averageInstallment = await simulationRepository.getAvaregeInstallment(
+    id
+  );
+  const lastSimulations = await simulationRepository.getLastSimulations(id);
+
+  const chartData = await simulationRepository.getChartData(id);
+
+  return reply.code(200).send({
+    recentSimulations: lastSimulations,
+    summary: {
+      totalSimulations: totalSimulations,
+      averageInstallment: averageInstallment,
+    },
+    chartData: chartData,
+  });
 }

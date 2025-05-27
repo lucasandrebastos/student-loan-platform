@@ -19,4 +19,41 @@ export const simulationRepository = {
     });
     return simulation;
   },
+
+  async getLastSimulations(id: string) {
+    const lastSimulations = await prisma.simulation.findMany({
+      where: { studentId: id },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+    return lastSimulations;
+  },
+
+  async getTotalSimulations(id: string) {
+    const totalSimulations = await prisma.simulation.count({
+      where: { studentId: id },
+    });
+
+    return totalSimulations;
+  },
+
+  async getAvaregeInstallment(id: string) {
+    const averageInstallment = await prisma.simulation.aggregate({
+      where: { studentId: id },
+      _avg: { monthly_installment_amount: true },
+    });
+    return averageInstallment;
+  },
+  async getChartData(id: string) {
+    const chartData = await prisma.$queryRaw`
+  SELECT
+    TO_CHAR("createdAt", 'YYYY-MM') as month,
+    SUM("total_value") as totalValue
+  FROM "Simulation"
+  WHERE "studentId" = ${id}
+  GROUP BY month
+  ORDER BY month;
+`;
+    return chartData;
+  },
 };
