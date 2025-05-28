@@ -88,15 +88,15 @@ export async function updateSimulation(
 
 export async function deleteSimulation(
   req: FastifyRequest<{
-    Body: { id: string };
+    Params: { id: string };
   }>,
   reply: FastifyReply
 ) {
-  const { id } = req.body;
+  const { id } = req.params;
 
   const simulation = await prisma.simulation.delete({
     where: {
-      id: id,
+      id,
     },
   });
   if (!simulation) {

@@ -1,27 +1,24 @@
+import { update } from "@/api/services/updateProfile";
+import type { RootState } from "@/store";
+import type { User } from "@/types/user";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
-type UpdateProfile = {
-  name: string;
-  lastName: string;
-  password: string;
-};
 export default function Profile() {
+  const user = useSelector((state: RootState) => state.user);
+  console.log(user);
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UpdateProfile>();
+  const { register, handleSubmit } = useForm<User>({
+    defaultValues: {
+      name: user?.name,
+      lastName: user?.lastName,
+    },
+  });
 
-  const onSubmit = (data: UpdateProfile) => {
+  const onSubmit = (data: User) => {
     setIsLoading(true);
-    console.log("Login attempt:", data);
-    // Simulate a login request
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Login successful!");
-    }, 2000);
+    update(data);
   };
 
   return (
@@ -75,7 +72,7 @@ export default function Profile() {
               </div>
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="password"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   Password
@@ -86,6 +83,22 @@ export default function Profile() {
                   {...register("password")}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  disabled
+                  value={user?.email}
+                  type="email"
+                  id="email"
+                  className="w-full px-3 py-2 border bg-gray-300 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+                <span></span>
               </div>
             </div>
 

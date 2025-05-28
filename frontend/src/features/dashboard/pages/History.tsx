@@ -1,4 +1,8 @@
-import axiosClient from "@/axios-client";
+import axiosClient from "@/api/apiClient";
+import {
+  deleteSimulationById,
+  getAllSimulations,
+} from "@/api/services/simulationsService";
 import {
   fetchSimulationsFailure,
   fetchSimulationsStart,
@@ -24,8 +28,8 @@ export default function renderHistory() {
       dispatch(fetchSimulationsStart());
 
       try {
-        const response = await axiosClient.get("/simulations");
-        dispatch(fetchSimulationsSuccess(response.data));
+        const response = await getAllSimulations();
+        dispatch(fetchSimulationsSuccess(response));
       } catch (err) {
         dispatch(fetchSimulationsFailure("Erro ao buscar simulações"));
       }
@@ -133,28 +137,34 @@ export default function renderHistory() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Interest Rate
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSimulations.map((simulation) => (
-                <tr
-                  key={simulation.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {new Date(simulation.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${simulation.monthly_installment_amount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {simulation.number_of_installments} months
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {simulation.monthly_interest}%
-                  </td>
-                </tr>
-              ))}
+              {filteredSimulations &&
+                filteredSimulations.map((simulation) => (
+                  <tr key={simulation.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {new Date(simulation.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ${simulation.monthly_installment_amount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {simulation.number_of_installments} months
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {simulation.monthly_interest}%
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <button
+                        onClick={() => deleteSimulationById(simulation.id)}
+                      >
+                        X
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

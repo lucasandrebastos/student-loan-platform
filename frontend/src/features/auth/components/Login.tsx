@@ -1,34 +1,23 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-import axiosClient from "@/axios-client";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../../redux/AuthSlice";
 import { useNavigate } from "react-router";
-
-type LoginCredentials = {
-  email: string;
-  password: string;
-};
+import type { LoginPayload } from "@/types/auth";
+import { login } from "@/api/services/authService";
 
 export default function LoginPlatform() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginCredentials>();
+  const { register, handleSubmit } = useForm<LoginPayload>();
 
-  const onSubmit = async (data: LoginCredentials) => {
+  const onSubmit = async (data: LoginPayload) => {
     try {
       setIsLoading(true);
-      const response = await axiosClient.post("/login", data);
-      const token = response.data.token;
-      localStorage.setItem("ACCESS_TOKEN", token);
-      dispatch(loginSuccess(token));
+      const response = await login(data);
 
+      dispatch(loginSuccess(response.token));
       setIsLoading(false);
       navigate("/dashboard");
     } catch (error) {

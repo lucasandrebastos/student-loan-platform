@@ -26,12 +26,13 @@ export async function updateStudent(
   }>,
   reply: FastifyReply
 ) {
-  const { email, name, lastName, password } = req.body;
+  const { id } = req.user as StudentPayload;
+  const { name, lastName, password } = req.body;
 
   const hash = await bcrypt.hash(password, 10);
 
   const student = await prisma.student.update({
-    where: { email: email },
+    where: { id: id },
     data: {
       name,
       lastName,
@@ -45,7 +46,7 @@ export async function updateStudent(
     });
   }
 
-  return reply.code(200).send({ name, lastName, email });
+  return reply.code(200).send({ name, lastName });
 }
 
 export async function dashboard(req: FastifyRequest, reply: FastifyReply) {

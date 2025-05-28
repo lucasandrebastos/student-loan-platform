@@ -1,33 +1,41 @@
-import axiosClient from "@/axios-client";
+import { getProfile } from "@/api/services/authService";
+import { getDashboard } from "@/api/services/dashboardService";
+
+import { setDashboard } from "@/redux/DashboardSlice";
 import { setUser } from "@/redux/UserSlice";
 import type { RootState } from "@/store";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-
-const mockStats = {
-  totalSimulations: 12,
-  averageLoanAmount: 22500,
-  approvedSimulations: 8,
-  totalFinanced: 180000,
-};
+import SimulationChart from "@/components/Chart/SimulationChart";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user);
+  const dashboard = useSelector((state: RootState) => state.dashboard);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await axiosClient.get("/me");
-        dispatch(setUser(response.data));
+        const response = await getDashboard();
+
+        dispatch(setDashboard(response));
       } catch (err) {
         console.error("Erro ao buscar dados do usuário", err);
         navigate("/login");
       }
     };
-
+    const fetchUser = async () => {
+      try {
+        const profile = await getProfile();
+        dispatch(setUser(profile));
+      } catch (err) {
+        console.error("Erro ao buscar dados do usuário", err);
+        navigate("/login");
+      }
+    };
+    fetchStats();
     fetchUser();
   }, [dispatch]);
 
@@ -51,7 +59,7 @@ export default function Dashboard() {
                 Total Simulations
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
-                {mockStats.totalSimulations}
+                {dashboard?.recentSimulations.length}
               </p>
               <p className="text-xs text-gray-500 mt-1">+2 from last month</p>
             </div>
@@ -78,7 +86,8 @@ export default function Dashboard() {
                 Average Loan Amount
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
-                ${mockStats.averageLoanAmount.toLocaleString()}
+                $
+                {dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Across all simulations
@@ -108,7 +117,7 @@ export default function Dashboard() {
                 Approved Simulations
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
-                {mockStats.approvedSimulations}
+                {dashboard?.recentSimulations.length}
               </p>
               <p className="text-xs text-gray-500 mt-1">67% approval rate</p>
             </div>
@@ -135,7 +144,8 @@ export default function Dashboard() {
                 Total Financed
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
-                ${mockStats.totalFinanced.toLocaleString()}
+                $
+                {dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 mt-1">Lifetime total</p>
             </div>
@@ -158,7 +168,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity */}
-      {/* <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
             Recent Activity
@@ -169,7 +179,7 @@ export default function Dashboard() {
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {mockSimulations.slice(0, 3).map((sim) => (
+            {dashboard?.recentSimulations.map((sim) => (
               <div
                 key={sim.id}
                 className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -178,25 +188,24 @@ export default function Dashboard() {
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      ${sim.amount.toLocaleString()} loan simulation
+                      ${sim.monthly_installment_amount.toLocaleString()} loan
+                      simulation
                     </p>
                     <p className="text-sm text-gray-600">
-                      {sim.date} • {sim.duration} months
+                      {new Date(sim.createdAt).toLocaleDateString()} •{" "}
+                      {sim.number_of_installments} months
                     </p>
                   </div>
                 </div>
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(
-                    sim.status
-                  )}`}
-                >
-                  {sim.status}
-                </span>
               </div>
             ))}
           </div>
         </div>
-      </div> */}
+      </div>
+
+      {/* CHART */}
+
+      <SimulationChart data={dashboard?.chartData} />
     </div>
   );
 }

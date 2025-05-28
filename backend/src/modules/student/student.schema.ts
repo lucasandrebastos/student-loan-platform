@@ -23,7 +23,6 @@ export const getMeSchema = z.object({
 export type GetMeInput = z.infer<typeof getMeSchema>;
 
 export const putMeSchema = z.object({
-  email: z.string().email("Invalid email format").min(1, "Email is required"),
   name: z.string().min(1, "Name is required"),
   lastName: z.string().min(1, "Last name is required"),
   password: z.string().min(6, "Password must be at least 6 characters long"),

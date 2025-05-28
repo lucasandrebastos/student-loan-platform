@@ -6,7 +6,7 @@ import {
 } from "../utils/getTokenFromHeaders";
 import { StudentPayload } from "../@types/fastify-jwt";
 
-export async function authenticatite(req: FastifyRequest, reply: FastifyReply) {
+export async function authenticate(req: FastifyRequest, reply: FastifyReply) {
   try {
     checkValidUser(req, reply);
     const token = getTokenFromHeaders(req.headers.authorization);

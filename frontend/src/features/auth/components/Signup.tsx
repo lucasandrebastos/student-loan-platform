@@ -1,40 +1,18 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axiosClient from "@/axios-client";
-
-type SignupCredentials = {
-  name: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
+import type { SignUpPayload } from "@/types/signup";
+import { signup } from "@/api/services/signupService";
 
 export default function SignUpPlatform() {
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignupCredentials>();
-  const onSubmit = (data: SignupCredentials) => {
+  const { register, handleSubmit } = useForm<SignUpPayload>();
+
+  const onSubmit = (data: SignUpPayload) => {
     setIsLoading(true);
-    axiosClient
-      .post("/register", data)
-      .then((response) => {
-        console.log("Register response:", response.data);
-      })
-      .catch((err) => {
-        const response = err.response;
-        if (response && response.status === 422) {
-          alert(response.data.message);
-        }
-      });
-    console.log("Sign Up attempt:", data);
-    // Simulate a signup request
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Account created successfully!");
-    }, 2000);
+
+    signup(data);
+
+    setIsLoading(false);
   };
 
   return (

@@ -11,29 +11,13 @@ import {
 } from "../../utils/getTokenFromHeaders";
 import { verifyJwt } from "../../utils/jwt";
 import { StudentPayload } from "../../@types/fastify-jwt";
+import { authenticate } from "../../plugins/authenticante";
 
 export async function simulationRoutes(app: FastifyInstance) {
   app.get(
     "/simulations",
     {
-      preHandler: async (req: FastifyRequest, reply: FastifyReply) => {
-        try {
-          checkValidUser(req, reply);
-          const token = getTokenFromHeaders(req.headers.authorization);
-          console.log("token", token);
-          const decoded = await verifyJwt(token as string);
-
-          if (decoded && typeof decoded !== "string") {
-            req.user = {
-              id: decoded.sub,
-            } as StudentPayload;
-          }
-
-          return decoded;
-        } catch {
-          return reply.code(401).send({ error: "Unauthorized" });
-        }
-      },
+      preHandler: authenticate,
     },
     getSimulations
   );
@@ -48,28 +32,15 @@ export async function simulationRoutes(app: FastifyInstance) {
   }>(
     "/simulations",
     {
-      preHandler: async (req: FastifyRequest, reply: FastifyReply) => {
-        try {
-          checkValidUser(req, reply);
-          const token = getTokenFromHeaders(req.headers.authorization);
-          console.log("token", token);
-          const decoded = await verifyJwt(token as string);
-
-          if (decoded && typeof decoded !== "string") {
-            req.user = {
-              id: decoded.sub,
-            } as StudentPayload;
-          }
-
-          return decoded;
-        } catch {
-          return reply.code(401).send({ error: "Unauthorized" });
-        }
-      },
+      preHandler: authenticate,
     },
     createSimulation
   );
 
   app.put("/simulations", updateSimulation);
-  app.delete("/simulations", deleteSimulation);
+  app.delete<{ Params: { id: string } }>(
+    "/simulations/:id",
+    { preHandler: authenticate },
+    deleteSimulation
+  );
 }

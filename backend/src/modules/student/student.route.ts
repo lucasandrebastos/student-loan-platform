@@ -1,22 +1,34 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { updateStudent, getStudent, dashboard } from "./student.controller";
-import { authenticatite } from "../../plugins/authenticante";
+import { authenticate } from "../../plugins/authenticante";
 
 export async function studentRoutes(app: FastifyInstance) {
   app.get(
     "/me",
     {
-      preHandler: authenticatite,
+      preHandler: authenticate,
     },
     getStudent
   );
 
-  app.put("/me", updateStudent);
+  app.put<{
+    Body: {
+      name: string;
+      lastName: string;
+      password: string;
+    };
+  }>(
+    "/me",
+    {
+      preHandler: authenticate,
+    },
+    updateStudent
+  );
 
   app.get(
     "/dashboard",
     {
-      preHandler: authenticatite,
+      preHandler: authenticate,
     },
     dashboard
   );
