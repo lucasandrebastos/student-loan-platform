@@ -1,4 +1,3 @@
-import axiosClient from "@/api/apiClient";
 import {
   deleteSimulationById,
   getAllSimulations,
@@ -16,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function renderHistory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
   const { data, loading, error } = useSelector(
