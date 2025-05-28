@@ -87,7 +87,9 @@ export default function Dashboard() {
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
                 $
-                {dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
+                {dashboard?.summary.averageInstallment._avg
+                  .monthly_installment_amount &&
+                  dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Across all simulations
@@ -145,7 +147,9 @@ export default function Dashboard() {
               </p>
               <p className="text-2xl font-bold text-gray-900 mt-2">
                 $
-                {dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
+                {dashboard?.summary.averageInstallment._avg
+                  .monthly_installment_amount &&
+                  dashboard?.summary.averageInstallment._avg.monthly_installment_amount.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 mt-1">Lifetime total</p>
             </div>
@@ -179,26 +183,33 @@ export default function Dashboard() {
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {dashboard?.recentSimulations.map((sim) => (
-              <div
-                key={sim.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      ${sim.monthly_installment_amount.toLocaleString()} loan
-                      simulation
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {new Date(sim.createdAt).toLocaleDateString()} •{" "}
-                      {sim.number_of_installments} months
-                    </p>
+            {dashboard?.recentSimulations &&
+              dashboard?.recentSimulations.map((sim) => (
+                <div
+                  key={sim.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        $
+                        {sim.monthly_installment_amount &&
+                          sim.monthly_installment_amount.toLocaleString()}{" "}
+                        loan simulation
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {sim.createdAt &&
+                          new Date(sim.createdAt).toLocaleDateString()}{" "}
+                        •{" "}
+                        {sim.number_of_installments &&
+                          sim.number_of_installments}{" "}
+                        months
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>

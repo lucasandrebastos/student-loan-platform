@@ -17,9 +17,7 @@ export default function renderHistory() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector(
-    (state: RootState) => state.simulations
-  );
+  const { data } = useSelector((state: RootState) => state.simulations);
 
   useEffect(() => {
     const fetchSimulations = async () => {

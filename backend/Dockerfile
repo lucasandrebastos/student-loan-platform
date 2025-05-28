@@ -1,6 +1,17 @@
-FROM node:18
+
+FROM node:20
+
 WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install 
+
 COPY . .
-RUN npm install
-EXPOSE 3333
+
+RUN npx prisma generate
+
+
+EXPOSE 3001
+
 CMD ["npm", "run", "dev"]

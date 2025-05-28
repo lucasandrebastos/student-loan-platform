@@ -5,9 +5,10 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json ",
     "dev": "ts-node-dev --project tsconfig.json src/server.ts ",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "prisma": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
